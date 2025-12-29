@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Pati Koruma - Pet Health ERP & CRM",
+  "description": "A comprehensive digital health tracking and management system for pets, owners, and veterinary clinics. Features ERP inventory management, CRM client relations, and AI-powered symptom analysis.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
