@@ -2,37 +2,93 @@
 import { Pet, Appointment, InventoryItem, Owner, MedicalRecord } from './types';
 
 export const COLORS = {
-  primary: '#6366f1', // Modern Indigo
-  secondary: '#8b5cf6', // Violet
-  accent: '#f43f5e', // Rose
+  primary: '#6366f1',
+  secondary: '#8b5cf6',
+  accent: '#f43f5e',
   light: '#f8fafc',
-  dark: '#0f172a', // Slate 900
+  dark: '#0f172a',
   glass: 'rgba(255, 255, 255, 0.7)'
 };
 
-export const MOCK_PETS: Pet[] = [
-  { id: '1', name: 'Buddy', type: 'Dog', breed: 'Golden Retriever', age: 3, weight: 28, ownerId: 'o1', imageUrl: 'https://picsum.photos/seed/buddy/200' },
-  { id: '2', name: 'Luna', type: 'Cat', breed: 'Siamese', age: 2, weight: 4.5, ownerId: 'o1', imageUrl: 'https://picsum.photos/seed/luna/200' },
-  { id: '3', name: 'Max', type: 'Dog', breed: 'Beagle', age: 5, weight: 12, ownerId: 'o2', imageUrl: 'https://picsum.photos/seed/max/200' },
-];
+// --- DATA GENERATORS ---
 
-export const MOCK_OWNERS: Owner[] = [
-  { id: 'o1', name: 'Ahmet Yılmaz', phone: '0532 123 45 67', email: 'ahmet@example.com', address: 'Istanbul, Kadıköy', pets: ['1', '2'] },
-  { id: 'o2', name: 'Ayşe Kaya', phone: '0544 987 65 43', email: 'ayse@example.com', address: 'Istanbul, Beşiktaş', pets: ['3'] },
-];
+const firstNames = ['Mehmet', 'Ayşe', 'Ali', 'Fatma', 'Can', 'Zeynep', 'Burak', 'Elif', 'Mert', 'Selin', 'Deniz', 'Seda', 'Onur', 'Gizem', 'Murat', 'Ece'];
+const lastNames = ['Yılmaz', 'Kaya', 'Demir', 'Çelik', 'Şahin', 'Yıldız', 'Öztürk', 'Arslan', 'Doğan', 'Aydın', 'Yavuz', 'Kılıç', 'Polat', 'Özkan'];
+const petNames = ['Buddy', 'Luna', 'Max', 'Bella', 'Charlie', 'Molly', 'Rocky', 'Lucy', 'Leo', 'Daisy', 'Milo', 'Zoe', 'Cooper', 'Chloe', 'Bentley', 'Sophie', 'Pamuk', 'Duman', 'Tarçın', 'Gofret', 'Boncuk', 'Limon'];
+const petBreeds = {
+  Dog: ['Golden Retriever', 'Beagle', 'Pug', 'German Shepherd', 'Bulldog', 'Poodle', 'Rottweiler'],
+  Cat: ['Siamese', 'Persian', 'Maine Coon', 'British Shorthair', 'Bengal', 'Sphynx'],
+  Bird: ['Budgie', 'Cockatiel', 'Canary', 'Parrot'],
+  Other: ['Hamster', 'Rabbit', 'Turtle']
+};
+const inventoryCategories = ['Vaccine', 'Medicine', 'Food', 'Equipment'] as const;
+const reasons = ['Yıllık Kontrol', 'Kuduz Aşısı', 'İç-Dış Parazit', 'Halsizlik Şikayeti', 'Tırnak Kesimi', 'Diş Temizliği', 'Kısırlaştırma Takibi'];
 
-export const MOCK_APPOINTMENTS: Appointment[] = [
-  { id: 'a1', petId: '1', petName: 'Buddy', ownerName: 'Ahmet Yılmaz', date: '2024-05-20', time: '10:30', reason: 'Kuduz Aşısı', status: 'Scheduled' },
-  { id: 'a2', petId: '2', petName: 'Luna', ownerName: 'Ahmet Yılmaz', date: '2024-05-20', time: '14:00', reason: 'Yıllık Kontrol', status: 'Scheduled' },
-];
+// 1. Generate Owners (1000+)
+export const MOCK_OWNERS: Owner[] = Array.from({ length: 1200 }).map((_, i) => ({
+  id: `o${i}`,
+  name: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
+  phone: `05${Math.floor(Math.random() * 90 + 10)} ${Math.floor(Math.random() * 900 + 100)} ${Math.floor(Math.random() * 90 + 10)} ${Math.floor(Math.random() * 90 + 10)}`,
+  email: `user${i}@example.com`,
+  address: `${['Istanbul', 'Ankara', 'Izmir', 'Bursa'][Math.floor(Math.random() * 4)]}, ${['Kadıköy', 'Çankaya', 'Konak', 'Nilüfer'][Math.floor(Math.random() * 4)]}`,
+  pets: [] // Will be populated in next step
+}));
 
-export const MOCK_INVENTORY: InventoryItem[] = [
-  { id: 'i1', name: 'Kuduz Aşısı (Rabies)', category: 'Vaccine', quantity: 45, unit: 'dose', reorderLevel: 10, price: 250 },
-  { id: 'i2', name: 'İç Parazit Tableti', category: 'Medicine', quantity: 120, unit: 'tablet', reorderLevel: 20, price: 85 },
-  { id: 'i3', name: 'Cerrahi Maske', category: 'Equipment', quantity: 500, unit: 'pcs', reorderLevel: 100, price: 2 },
-];
+// 2. Generate Pets (2000+)
+export const MOCK_PETS: Pet[] = Array.from({ length: 2200 }).map((_, i) => {
+  const type = (['Dog', 'Cat', 'Bird', 'Other'] as const)[Math.floor(Math.random() * 4)];
+  const ownerIndex = Math.floor(Math.random() * MOCK_OWNERS.length);
+  const petId = `p${i}`;
+  MOCK_OWNERS[ownerIndex].pets.push(petId);
+  
+  return {
+    id: petId,
+    name: petNames[Math.floor(Math.random() * petNames.length)],
+    type,
+    breed: petBreeds[type][Math.floor(Math.random() * petBreeds[type].length)],
+    age: Math.floor(Math.random() * 15) + 1,
+    weight: Math.floor(Math.random() * 30) + 1,
+    ownerId: MOCK_OWNERS[ownerIndex].id,
+    imageUrl: `https://picsum.photos/seed/pet${i}/200`
+  };
+});
 
-export const MOCK_MEDICAL_RECORDS: MedicalRecord[] = [
-  { id: 'm1', petId: '1', date: '2024-04-15', description: 'Karma Aşı uygulandı.', treatment: 'Aşı', veterinarian: 'Dr. Selin Demir', type: 'Vaccination' },
-  { id: 'm2', petId: '3', date: '2024-04-10', description: 'Kulak enfeksiyonu kontrolü.', treatment: 'Antibiyotik Damla', veterinarian: 'Dr. Selin Demir', type: 'Checkup' },
-];
+// 3. Generate Inventory (1000+)
+export const MOCK_INVENTORY: InventoryItem[] = Array.from({ length: 1050 }).map((_, i) => {
+  const category = inventoryCategories[Math.floor(Math.random() * inventoryCategories.length)];
+  const names: Record<string, string[]> = {
+    Vaccine: ['Kuduz Aşısı', 'Karma Aşı', 'Lösemi Aşısı', 'Bronşit Aşısı'],
+    Medicine: ['Antibiyotik S', 'Ağrı Kesici Plus', 'Parazit Tableti X', 'Vitamin Mix'],
+    Food: ['Premium Puppy 15kg', 'Sterilized Cat Food 2kg', 'Grain Free Diet'],
+    Equipment: ['Cerrahi Eldiven', 'Enjektör 2ml', 'Bandaj Seti', 'Dijital Termometre']
+  };
+  
+  return {
+    id: `i${i}`,
+    name: `${names[category][Math.floor(Math.random() * names[category].length)]} v${i}`,
+    category,
+    quantity: Math.floor(Math.random() * 200),
+    unit: category === 'Food' ? 'kg' : category === 'Medicine' ? 'tablet' : 'adet',
+    reorderLevel: 15,
+    price: Math.floor(Math.random() * 1500) + 50
+  };
+});
+
+// 4. Generate Appointments (1000+)
+export const MOCK_APPOINTMENTS: Appointment[] = Array.from({ length: 1100 }).map((_, i) => {
+  const pet = MOCK_PETS[Math.floor(Math.random() * MOCK_PETS.length)];
+  const owner = MOCK_OWNERS.find(o => o.id === pet.ownerId);
+  
+  return {
+    id: `a${i}`,
+    petId: pet.id,
+    petName: pet.name,
+    ownerName: owner?.name || 'Bilinmiyor',
+    date: `2024-05-${Math.floor(Math.random() * 28) + 1}`,
+    time: `${String(Math.floor(Math.random() * 9) + 9).padStart(2, '0')}:${(['00', '15', '30', '45'])[Math.floor(Math.random() * 4)]}`,
+    reason: reasons[Math.floor(Math.random() * reasons.length)],
+    status: Math.random() > 0.3 ? 'Scheduled' : 'Completed'
+  };
+});
+
+// TOTAL DATA: ~5550 items
